@@ -20,6 +20,10 @@ export interface TaskEditArgs {
 	addDocumentation?: string[];
 	removeDocumentation?: string[];
 	modifiedFiles?: string[];
+	spec?: string;
+	specSet?: string;
+	specAppend?: string[];
+	specClear?: boolean;
 	implementationPlan?: string;
 	planSet?: string;
 	planAppend?: string[];

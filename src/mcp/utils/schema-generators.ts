@@ -438,6 +438,26 @@ export function generateTaskEditSchema(config: BacklogConfig): JsonSchema {
 				maxLength: 100,
 				description: "Optional author label to store with appended comments.",
 			},
+			spec: {
+				type: "string",
+				maxLength: 20000,
+				description: "Specification of what the task must deliver (replaces the existing Spec section).",
+			},
+			specAppend: {
+				type: "array",
+				items: {
+					type: "string",
+					maxLength: 5000,
+				},
+				maxItems: 20,
+			},
+			specClear: {
+				type: "boolean",
+			},
+			specSet: {
+				type: "string",
+				maxLength: 20000,
+			},
 			planSet: {
 				type: "string",
 				maxLength: 20000,

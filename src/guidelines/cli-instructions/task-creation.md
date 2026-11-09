@@ -62,6 +62,7 @@ Include:
 - A clear title.
 - A description that captures why the task exists: the problem, trigger, or user need behind it, plus any context a future agent cannot recover from the code. The acceptance criteria already state what will be true when the work is done — do not restate them here.
 - Acceptance criteria that are specific, testable, and independent.
+- A spec with `--spec` when the deliverable's scope, requirements, or constraints need to be explicit; it captures the "what" that the plan's "how" will later build on.
 - References or documentation when they are needed for implementation.
 - Dependencies when work must happen in order.
 - An assignee with `-a` when the task has a known owner; omitting it applies the project's configured `defaultAssignee` when one is set, and `-a ""` leaves the task unassigned instead.

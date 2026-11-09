@@ -21,6 +21,7 @@ interface TaskWizardValues {
 	labels: string;
 	acceptanceCriteria: string;
 	definitionOfDone: string;
+	spec: string;
 	implementationPlan: string;
 	implementationNotes: string;
 	references: string;
@@ -522,6 +523,14 @@ async function runTaskWizardValues(params: {
 			},
 			{
 				type: "text",
+				name: "spec",
+				message:
+					params.mode === "create"
+						? `Spec (${SINGLE_LINE_PROMPT_GUIDANCE})`
+						: `Spec (${SINGLE_LINE_PROMPT_GUIDANCE}; blank keeps current value)`,
+			},
+			{
+				type: "text",
 				name: "implementationPlan",
 				message:
 					params.mode === "create"
@@ -608,6 +617,7 @@ async function runTaskWizardValues(params: {
 			labels: values.labels,
 			acceptanceCriteria: values.acceptanceCriteria,
 			definitionOfDone: values.definitionOfDone,
+			spec: values.spec,
 			implementationPlan: values.implementationPlan,
 			implementationNotes: values.implementationNotes,
 			references: values.references,
@@ -665,6 +675,7 @@ function toInitialWizardValues(input: { title?: string } & Partial<Task>): TaskW
 		labels: formatListInput(input.labels),
 		acceptanceCriteria: formatChecklistInput(input.acceptanceCriteriaItems),
 		definitionOfDone: formatChecklistInput(input.definitionOfDoneItems),
+		spec: input.spec ?? "",
 		implementationPlan: input.implementationPlan ?? "",
 		implementationNotes: input.implementationNotes ?? "",
 		references: formatListInput(input.references),
@@ -725,6 +736,7 @@ export async function runTaskCreateWizard(
 		...(documentation.length > 0 && { documentation }),
 		...(acceptanceCriteria.length > 0 && { acceptanceCriteria }),
 		...(definitionOfDoneAdd.length > 0 && { definitionOfDoneAdd }),
+		...(values.spec.trim().length > 0 && { spec: values.spec }),
 		...(values.implementationPlan.trim().length > 0 && { implementationPlan: values.implementationPlan }),
 		...(values.implementationNotes.trim().length > 0 && { implementationNotes: values.implementationNotes }),
 	};
@@ -803,6 +815,9 @@ export async function runTaskEditWizard(
 		updateInput.documentation = nextDocumentation;
 	}
 
+	if (values.spec !== initial.spec) {
+		updateInput.spec = values.spec;
+	}
 	if (values.implementationPlan !== initial.implementationPlan) {
 		updateInput.implementationPlan = values.implementationPlan;
 	}

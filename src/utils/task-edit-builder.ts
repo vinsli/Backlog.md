@@ -138,6 +138,20 @@ export function buildTaskUpdateInput(args: TaskEditArgs): TaskUpdateInput {
 		updateInput.modifiedFiles = modifiedFiles;
 	}
 
+	const specSet = args.specSet ?? args.spec;
+	if (typeof specSet === "string") {
+		updateInput.spec = specSet;
+	}
+
+	const specAppends = sanitizeAppend(args.specAppend);
+	if (specAppends) {
+		updateInput.appendSpec = specAppends;
+	}
+
+	if (args.specClear) {
+		updateInput.clearSpec = true;
+	}
+
 	const planSet = args.planSet ?? args.implementationPlan;
 	if (typeof planSet === "string") {
 		updateInput.implementationPlan = planSet;

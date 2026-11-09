@@ -98,6 +98,7 @@ export function parseTask(content: string): Task {
 
 	// Parse other sections
 	const descriptionSection = extractStructuredSection(rawContent, STRUCTURED_SECTION_KEYS.description) || "";
+	const specSection = extractStructuredSection(rawContent, STRUCTURED_SECTION_KEYS.spec) || undefined;
 	const planSection = extractStructuredSection(rawContent, STRUCTURED_SECTION_KEYS.implementationPlan) || undefined;
 	const notesSection = extractStructuredSection(rawContent, STRUCTURED_SECTION_KEYS.implementationNotes) || undefined;
 	const finalSummarySection = extractStructuredSection(rawContent, STRUCTURED_SECTION_KEYS.finalSummary) || undefined;
@@ -125,6 +126,7 @@ export function parseTask(content: string): Task {
 		acceptanceCriteriaItems: structuredCriteria,
 		definitionOfDoneItems: structuredDefinitionOfDone,
 		description: descriptionSection,
+		spec: specSection,
 		implementationPlan: planSection,
 		implementationNotes: notesSection,
 		comments,

@@ -64,6 +64,7 @@ type InlineMetaUpdatePayload = Omit<Partial<Task>, "milestone"> & {
 type TaskDetailsFormState = {
   title: string;
   description: string;
+  spec: string;
   plan: string;
   notes: string;
   displayComments: TaskComment[];
@@ -122,6 +123,7 @@ const buildTaskDetailsFormState = ({
   title: task?.title || "",
   description: task?.description || "",
   plan: task?.implementationPlan || "",
+  spec: task?.spec || "",
   notes: task?.implementationNotes || "",
   displayComments: task?.comments ?? [],
   finalSummary: task?.finalSummary || "",
@@ -223,6 +225,7 @@ export const TaskDetailsModal: React.FC<Props> = ({
   // Editable fields (edit mode)
   const [description, setDescription] = useState(task?.description || "");
   const [plan, setPlan] = useState(task?.implementationPlan || "");
+  const [spec, setSpec] = useState(task?.spec || "");
   const [notes, setNotes] = useState(task?.implementationNotes || "");
   const [displayComments, setDisplayComments] = useState<TaskComment[]>(task?.comments ?? []);
   const [commentBody, setCommentBody] = useState("");
@@ -453,6 +456,7 @@ export const TaskDetailsModal: React.FC<Props> = ({
     title: task?.title || "",
     description: task?.description || "",
     plan: task?.implementationPlan || "",
+    spec: task?.spec || "",
     notes: task?.implementationNotes || "",
     finalSummary: task?.finalSummary || "",
     dueDate: task?.dueDate || "",
@@ -465,13 +469,14 @@ export const TaskDetailsModal: React.FC<Props> = ({
       title !== baseline.title ||
       description !== baseline.description ||
       plan !== baseline.plan ||
+      spec !== baseline.spec ||
       notes !== baseline.notes ||
       finalSummary !== baseline.finalSummary ||
       dueDate !== baseline.dueDate ||
       JSON.stringify(criteria) !== baseline.criteria ||
       JSON.stringify(definitionOfDone) !== baseline.definitionOfDone
     );
-  }, [title, description, plan, notes, finalSummary, dueDate, criteria, definitionOfDone, baseline]);
+  }, [title, description, plan, spec, notes, finalSummary, dueDate, criteria, definitionOfDone, baseline]);
 
   useEffect(() => {
     modeRef.current = mode;
@@ -513,7 +518,7 @@ export const TaskDetailsModal: React.FC<Props> = ({
     };
     window.addEventListener("keydown", onKey, { capture: true });
     return () => window.removeEventListener("keydown", onKey, { capture: true } as any);
-  }, [mode, title, description, plan, notes, finalSummary, criteria, definitionOfDone, status, availableStatuses, isReadOnly]);
+  }, [mode, title, description, plan, spec, notes, finalSummary, criteria, definitionOfDone, status, availableStatuses, isReadOnly]);
 
   // Reset local state when task changes or modal opens
   useEffect(() => {
@@ -547,6 +552,7 @@ export const TaskDetailsModal: React.FC<Props> = ({
         preserveDirtyRefreshValue(current, previousFormState.description, nextFormState.description),
       );
       setPlan((current) => preserveDirtyRefreshValue(current, previousFormState.plan, nextFormState.plan));
+      setSpec((current) => preserveDirtyRefreshValue(current, previousFormState.spec, nextFormState.spec));
       setNotes((current) => preserveDirtyRefreshValue(current, previousFormState.notes, nextFormState.notes));
       setDisplayComments(nextFormState.displayComments);
       setCommentSaving(false);
@@ -605,6 +611,7 @@ export const TaskDetailsModal: React.FC<Props> = ({
     setTitle(nextFormState.title);
     setDescription(nextFormState.description);
     setPlan(nextFormState.plan);
+    setSpec(nextFormState.spec);
     setNotes(nextFormState.notes);
     setDisplayComments(nextFormState.displayComments);
     setCommentBody("");
@@ -688,6 +695,7 @@ export const TaskDetailsModal: React.FC<Props> = ({
       setTitle(task?.title || "");
       setDescription(task?.description || "");
       setPlan(task?.implementationPlan || "");
+      setSpec(task?.spec || "");
       setNotes(task?.implementationNotes || "");
       setCommentBody("");
       setCommentAuthor("");
@@ -811,6 +819,7 @@ export const TaskDetailsModal: React.FC<Props> = ({
         title: title.trim(),
         description,
         implementationPlan: plan,
+        spec,
         implementationNotes: notes,
         finalSummary,
         acceptanceCriteriaItems: criteria,
@@ -1576,6 +1585,30 @@ export const TaskDetailsModal: React.FC<Props> = ({
               <DependencyGraphSection graph={dependencyGraph} />
             </section>
           )}
+
+          {/* Spec */}
+          <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+            <SectionHeader title="Spec" />
+            {mode === "preview" ? (
+              spec ? (
+                <div className="prose prose-sm !max-w-none wmde-markdown" data-color-mode={theme}>
+                  <MermaidMarkdown source={spec} />
+                </div>
+              ) : (
+                <div className="text-sm text-gray-500 dark:text-gray-400">No spec</div>
+              )
+            ) : (
+              <div className="border border-gray-200 dark:border-gray-700 rounded-md">
+                <MDEditor
+                  value={spec}
+                  onChange={(val) => setSpec(val || "")}
+                  preview="edit"
+                  height={200}
+                  data-color-mode={theme}
+                />
+              </div>
+            )}
+          </div>
 
           {/* Implementation Plan */}
           <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">

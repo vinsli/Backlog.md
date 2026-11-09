@@ -105,7 +105,7 @@ describe("addAgentInstructions", () => {
 
 		expect(agents).toContain("Before task lifecycle actions, read the matching detailed guide:");
 		expect(agents).toContain(
-			"`backlog instructions task-execution` before planning, changing status or assignee, adding a plan or implementation notes, or implementing task work",
+			"`backlog instructions task-execution` before planning, changing status or assignee, adding a spec, plan, or implementation notes, or implementing task work",
 		);
 		expect(agents).toContain(
 			"`backlog instructions task-finalization` before checking acceptance criteria, writing final summaries, or moving tasks to terminal statuses",

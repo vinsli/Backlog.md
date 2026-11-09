@@ -96,6 +96,9 @@ export function serializeTask(task: Task, originalContent = ""): string {
 			contentBody = DefinitionOfDoneManager.updateContent(contentBody, task.definitionOfDoneItems);
 		}
 	}
+	if (typeof task.spec === "string" && sectionChanged(rawContent, "spec", task.spec)) {
+		contentBody = updateTaskSpec(contentBody, task.spec);
+	}
 	if (
 		typeof task.implementationPlan === "string" &&
 		sectionChanged(rawContent, "implementationPlan", task.implementationPlan)
@@ -178,10 +181,22 @@ export function updateTaskAcceptanceCriteria(content: string, criteria: string[]
 	return useCRLF ? out.replace(/\n/g, "\r\n") : out;
 }
 
+export function updateTaskSpec(content: string, spec: string): string {
+	const sections = getStructuredSections(content);
+	return updateStructuredSections(content, {
+		description: sections.description ?? "",
+		spec,
+		implementationPlan: sections.implementationPlan ?? "",
+		implementationNotes: sections.implementationNotes ?? "",
+		finalSummary: sections.finalSummary ?? "",
+	});
+}
+
 export function updateTaskImplementationPlan(content: string, plan: string): string {
 	const sections = getStructuredSections(content);
 	return updateStructuredSections(content, {
 		description: sections.description ?? "",
+		spec: sections.spec ?? "",
 		implementationPlan: plan,
 		implementationNotes: sections.implementationNotes ?? "",
 		finalSummary: sections.finalSummary ?? "",
@@ -192,6 +207,7 @@ export function updateTaskImplementationNotes(content: string, notes: string): s
 	const sections = getStructuredSections(content);
 	return updateStructuredSections(content, {
 		description: sections.description ?? "",
+		spec: sections.spec ?? "",
 		implementationPlan: sections.implementationPlan ?? "",
 		implementationNotes: notes,
 		finalSummary: sections.finalSummary ?? "",
@@ -202,6 +218,7 @@ export function updateTaskFinalSummary(content: string, summary: string): string
 	const sections = getStructuredSections(content);
 	return updateStructuredSections(content, {
 		description: sections.description ?? "",
+		spec: sections.spec ?? "",
 		implementationPlan: sections.implementationPlan ?? "",
 		implementationNotes: sections.implementationNotes ?? "",
 		finalSummary: summary,
@@ -225,6 +242,7 @@ export function appendTaskImplementationNotes(content: string, notesChunks: stri
 	const combined = existingNotes ? `${existingNotes}\n\n${appendedBlock}` : appendedBlock;
 	return updateStructuredSections(content, {
 		description: sections.description ?? "",
+		spec: sections.spec ?? "",
 		implementationPlan: sections.implementationPlan ?? "",
 		implementationNotes: combined,
 		finalSummary: sections.finalSummary ?? "",
@@ -235,6 +253,7 @@ export function updateTaskDescription(content: string, description: string): str
 	const sections = getStructuredSections(content);
 	return updateStructuredSections(content, {
 		description,
+		spec: sections.spec ?? "",
 		implementationPlan: sections.implementationPlan ?? "",
 		implementationNotes: sections.implementationNotes ?? "",
 		finalSummary: sections.finalSummary ?? "",

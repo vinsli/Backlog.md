@@ -60,6 +60,7 @@ export interface Task {
 	modifiedFiles?: string[];
 	readonly rawContent?: string; // Raw markdown content without frontmatter (read-only: do not modify directly)
 	description?: string;
+	spec?: string;
 	implementationPlan?: string;
 	implementationNotes?: string;
 	comments?: TaskComment[];
@@ -139,6 +140,7 @@ export interface TaskCreateInput {
 	documentation?: string[];
 	modifiedFiles?: string[];
 	parentTaskId?: string;
+	spec?: string;
 	implementationPlan?: string;
 	implementationNotes?: string;
 	finalSummary?: string;
@@ -175,6 +177,9 @@ export interface TaskUpdateInput {
 	implementationPlan?: string;
 	appendImplementationPlan?: string[];
 	clearImplementationPlan?: boolean;
+	spec?: string;
+	appendSpec?: string[];
+	clearSpec?: boolean;
 	implementationNotes?: string;
 	appendImplementationNotes?: string[];
 	clearImplementationNotes?: boolean;

@@ -19,16 +19,19 @@ Before writing code for non-trivial work:
    - `backlog task edit {{TASK_ID:123}} -s "<active status>" -a @your-name`
 4. Research the current system, including relevant code, tests, conventions, and recent changes. Do not rely on an
    implementation approach proposed when the task was created.
-5. Draft an implementation plan.
-6. Record the current plan in the task before implementation:
+5. If the task has no Spec, capture what it must deliver — scope, requirements, and constraints — before planning:
+   - `backlog task edit {{TASK_ID:123}} --spec "Must support batches up to 10k; per-item errors are not fatal"`
+6. Draft an implementation plan.
+7. Record the current plan in the task before implementation:
    - `backlog task edit {{TASK_ID:123}} --plan "1. ..."`
-7. If the plan contains a material product, architecture, or workflow decision, or the project or user requires plan
+8. If the plan contains a material product, architecture, or workflow decision, or the project or user requires plan
    review, present it and wait for explicit approval before implementation. Routine plans need not block when no review
    was requested and they stay within confirmed scope.
 
 Keep the Backlog task as the plan of record. If the approach changes, replace it with `--plan` or extend it with one
 or more repeatable `--append-plan` values. When both options are provided, `--plan` replaces the existing plan first,
-then each `--append-plan` value is appended in CLI order:
+then each `--append-plan` value is appended in CLI order. The Spec section works the same way with `--spec` and
+`--append-spec`:
 
 - `backlog task edit {{TASK_ID:123}} --append-plan "5. Verify the revised approach"`
 - `backlog task edit {{TASK_ID:123}} --plan "1. Revised approach" --append-plan "2. Verify it"`
@@ -46,7 +49,7 @@ Work in short loops:
 
 Use `backlog task edit {{TASK_ID:123}} --help` before changing unfamiliar fields.
 
-Replacing or clearing a legacy description, plan, notes, or final summary without section markers is refused if another
+Replacing or clearing a legacy description, spec, plan, notes, or final summary without section markers is refused if another
 level-two heading makes its boundary ambiguous. The file stays unchanged. Stop and ask the user to add the BEGIN and
 END markers named in the error around the intended section body without removing any content. Do not edit task or
 draft files directly. The user should place the END marker before a separate section, or after headings that belong

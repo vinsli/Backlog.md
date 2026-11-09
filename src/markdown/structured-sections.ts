@@ -2,10 +2,16 @@ import { fromMarkdown } from "mdast-util-from-markdown";
 import type { AcceptanceCriterion, TaskComment } from "../types/index.ts";
 import { getStructuredSectionTitles } from "./section-titles.ts";
 
-export type StructuredSectionKey = "description" | "implementationPlan" | "implementationNotes" | "finalSummary";
+export type StructuredSectionKey =
+	| "description"
+	| "spec"
+	| "implementationPlan"
+	| "implementationNotes"
+	| "finalSummary";
 
 export const STRUCTURED_SECTION_KEYS: Record<StructuredSectionKey, StructuredSectionKey> = {
 	description: "description",
+	spec: "spec",
 	implementationPlan: "implementationPlan",
 	implementationNotes: "implementationNotes",
 	finalSummary: "finalSummary",
@@ -18,6 +24,7 @@ interface SectionConfig {
 
 const SECTION_CONFIG: Record<StructuredSectionKey, SectionConfig> = {
 	description: { title: "Description", markerId: "DESCRIPTION" },
+	spec: { title: "Spec", markerId: "SPEC" },
 	implementationPlan: { title: "Implementation Plan", markerId: "PLAN" },
 	implementationNotes: { title: "Implementation Notes", markerId: "NOTES" },
 	finalSummary: { title: "Final Summary", markerId: "FINAL_SUMMARY" },
@@ -25,6 +32,7 @@ const SECTION_CONFIG: Record<StructuredSectionKey, SectionConfig> = {
 
 const SECTION_INSERTION_ORDER: StructuredSectionKey[] = [
 	"description",
+	"spec",
 	"implementationPlan",
 	"implementationNotes",
 	"finalSummary",
@@ -792,6 +800,7 @@ export function extractStructuredSection(content: string, key: StructuredSection
 
 export interface StructuredSectionValues {
 	description?: string;
+	spec?: string;
 	implementationPlan?: string;
 	implementationNotes?: string;
 	finalSummary?: string;
@@ -833,6 +842,7 @@ export function updateStructuredSections(content: string, sections: SectionValue
 	working = working.trim();
 
 	const description = sections.description?.trim() || "";
+	const spec = sections.spec?.trim() || "";
 	const plan = sections.implementationPlan?.trim() || "";
 	const notes = sections.implementationNotes?.trim() || "";
 	const finalSummary = sections.finalSummary?.trim() || "";
@@ -855,9 +865,31 @@ export function updateStructuredSections(content: string, sections: SectionValue
 		}
 	}
 
+	// The Spec documents WHAT needs to be built, so it belongs directly before the
+	// Implementation Plan that describes HOW. Every insertion anchor mirrors the plan
+	// chain: when the plan exists, spec lands between it and the preceding DOD/AC/description.
+	if (spec) {
+		const specBlock = buildSectionBlock("spec", spec, legacySections.has("spec"));
+		let res = insertAfterSection(tail, DEFINITION_OF_DONE_TITLE, specBlock);
+		if (!res.inserted) {
+			res = insertAfterSection(tail, ACCEPTANCE_CRITERIA_TITLE, specBlock);
+		}
+		if (!res.inserted) {
+			res = insertAfterSection(tail, getConfig("description").title, specBlock);
+		}
+		if (!res.inserted) {
+			tail = insertAtStart(tail, specBlock);
+		} else {
+			tail = res.content;
+		}
+	}
+
 	if (notes) {
 		const notesBlock = buildSectionBlock("implementationNotes", notes, legacySections.has("implementationNotes"));
 		let res = insertAfterSection(tail, getConfig("implementationPlan").title, notesBlock);
+		if (!res.inserted) {
+			res = insertAfterSection(tail, getConfig("spec").title, notesBlock);
+		}
 		if (!res.inserted) {
 			res = insertAfterSection(tail, DEFINITION_OF_DONE_TITLE, notesBlock);
 		}
@@ -887,6 +919,9 @@ export function updateStructuredSections(content: string, sections: SectionValue
 			res = insertAfterSection(tail, getConfig("implementationPlan").title, finalBlock);
 		}
 		if (!res.inserted) {
+			res = insertAfterSection(tail, getConfig("spec").title, finalBlock);
+		}
+		if (!res.inserted) {
 			res = insertAfterSection(tail, DEFINITION_OF_DONE_TITLE, finalBlock);
 		}
 		if (!res.inserted) {
@@ -912,6 +947,7 @@ export function updateStructuredSections(content: string, sections: SectionValue
 export function getStructuredSections(content: string): StructuredSectionValues {
 	return {
 		description: extractStructuredSection(content, "description") || undefined,
+		spec: extractStructuredSection(content, "spec") || undefined,
 		implementationPlan: extractStructuredSection(content, "implementationPlan") || undefined,
 		implementationNotes: extractStructuredSection(content, "implementationNotes") || undefined,
 		finalSummary: extractStructuredSection(content, "finalSummary") || undefined,
@@ -1054,12 +1090,14 @@ function updateChecklistContent(
 		definition === ACCEPTANCE_CRITERIA_DEFINITION
 			? [
 					DEFINITION_OF_DONE_TITLE,
+					getConfig("spec").title,
 					getConfig("implementationPlan").title,
 					getConfig("implementationNotes").title,
 					COMMENTS_TITLE,
 					getConfig("finalSummary").title,
 				]
 			: [
+					getConfig("spec").title,
 					getConfig("implementationPlan").title,
 					getConfig("implementationNotes").title,
 					COMMENTS_TITLE,

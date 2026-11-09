@@ -602,6 +602,7 @@ function hasCreateFieldFlags(options: Record<string, unknown>): boolean {
 			options.dod !== undefined ||
 			options.dodDefaults === false ||
 			options.plan !== undefined ||
+			options.spec !== undefined ||
 			options.notes !== undefined ||
 			options.finalSummary !== undefined ||
 			options.draft ||
@@ -645,11 +646,13 @@ function hasEditFieldFlags(options: Record<string, unknown>): boolean {
 			options.uncheckDod !== undefined ||
 			options.acceptanceCriteria !== undefined ||
 			options.plan !== undefined ||
+			options.spec !== undefined ||
 			options.notes !== undefined ||
 			options.comment !== undefined ||
 			options.commentAuthor !== undefined ||
 			options.finalSummary !== undefined ||
 			options.appendPlan !== undefined ||
+			options.appendSpec !== undefined ||
 			options.appendNotes !== undefined ||
 			options.appendFinalSummary !== undefined ||
 			options.clearFinalSummary ||
@@ -679,6 +682,8 @@ const PER_TASK_ONLY_EDIT_FLAGS: ReadonlyArray<{ option: string; flag: string }> 
 	{ option: "desc", flag: "--desc" },
 	{ option: "plan", flag: "--plan" },
 	{ option: "appendPlan", flag: "--append-plan" },
+	{ option: "spec", flag: "--spec" },
+	{ option: "appendSpec", flag: "--append-spec" },
 	{ option: "notes", flag: "--notes" },
 	{ option: "appendNotes", flag: "--append-notes" },
 	{ option: "finalSummary", flag: "--final-summary" },
@@ -1992,6 +1997,7 @@ addHelpSchema(taskCmd.command("create [title]"), {
 			description:
 				"Only for already-started work created directly in a configured active status (for example, In Progress)",
 		},
+		{ name: "spec", type: "Markdown", description: "Specification of what the task must deliver" },
 		{ name: "notes", type: "Markdown", description: "Same restriction as plan" },
 		{
 			name: "final-summary",
@@ -2033,6 +2039,7 @@ addHelpSchema(taskCmd.command("create [title]"), {
 		"--plan <text>",
 		"add a plan only for already-started work created directly in an active status (for example, In Progress)",
 	)
+	.option("--spec <text>", "add a specification of what the task must deliver")
 	.option("--notes <text>", "add implementation notes")
 	.option("--final-summary <text>", "add final summary")
 	.option("--ordinal <number>", "set task ordinal for custom ordering")
@@ -2153,6 +2160,7 @@ addHelpSchema(taskCmd.command("create [title]"), {
 				...(ordinalValue !== undefined ? { ordinal: ordinalValue } : {}),
 				milestone,
 				implementationPlan: options.plan ? String(options.plan) : undefined,
+				spec: options.spec ? String(options.spec) : undefined,
 				implementationNotes: options.notes ? String(options.notes) : undefined,
 				finalSummary: options.finalSummary ? String(options.finalSummary) : undefined,
 				acceptanceCriteria: criteria.map((text) => ({ text, checked: false })),
@@ -3483,6 +3491,7 @@ async function performEdit(target: EditCommandTarget, requestedIds: string[] | u
 	const normalizedModifiedFiles = parseDelimitedStringList(options.modifiedFile);
 
 	const planAppendValues = toStringArray(options.appendPlan);
+	const specAppendValues = toStringArray(options.appendSpec);
 	const notesAppendValues = toStringArray(options.appendNotes);
 	const commentsAppendValues = toStringArray(options.comment);
 	const finalSummaryAppendValues = toStringArray(options.appendFinalSummary);
@@ -3565,11 +3574,17 @@ async function performEdit(target: EditCommandTarget, requestedIds: string[] | u
 	if (typeof options.plan === "string") {
 		editArgs.planSet = String(options.plan);
 	}
+	if (typeof options.spec === "string") {
+		editArgs.specSet = String(options.spec);
+	}
 	if (typeof options.notes === "string") {
 		editArgs.notesSet = String(options.notes);
 	}
 	if (planAppendValues.length > 0) {
 		editArgs.planAppend = planAppendValues;
+	}
+	if (specAppendValues.length > 0) {
+		editArgs.specAppend = specAppendValues;
 	}
 	if (notesAppendValues.length > 0) {
 		editArgs.notesAppend = notesAppendValues;
@@ -3736,6 +3751,7 @@ function configureEditCommand(cmd: Command) {
 		)
 		.option("--clear-ac", "remove all acceptance criteria (cannot combine with acceptance criteria mutation options)")
 		.option("--plan <text>", "set implementation plan")
+		.option("--spec <text>", "set spec (what the task must deliver)")
 		.option("--notes <text>", "set implementation notes (replaces existing)")
 		.option(
 			"--comment <text>",
@@ -3749,6 +3765,7 @@ function configureEditCommand(cmd: Command) {
 			"append after --plan replacement (can be used multiple times)",
 			createMultiValueAccumulator(),
 		)
+		.option("--append-spec <text>", "append to spec (can be used multiple times)", createMultiValueAccumulator())
 		.option(
 			"--append-notes <text>",
 			"append to implementation notes (can be used multiple times)",
@@ -3902,6 +3919,8 @@ const taskEditCommand = addHelpSchema(taskCmd.command("edit [taskIds...]"), {
 			type: "Markdown",
 			description: "Append after --plan replacement; repeatable",
 		},
+		{ name: "spec", type: "Markdown", description: "Replacement spec (what the task must deliver)" },
+		{ name: "append-spec", type: "Markdown", description: "Append to spec; repeatable" },
 		{ name: "notes", type: "Markdown", description: "Replacement implementation notes" },
 		{ name: "append-notes", type: "Markdown", description: "Append to implementation notes; repeatable" },
 		{ name: "comment", type: "Markdown", description: "Append a discussion comment" },
@@ -4309,6 +4328,8 @@ const draftEditCommand = addHelpSchema(draftCmd.command("edit [taskId]"), {
 		{ name: "uncheck-dod", type: "Integer", description: "Uncheck Definition of Done item by index; repeatable" },
 		{ name: "plan", type: "Markdown", description: "Replacement implementation plan" },
 		{ name: "append-plan", type: "Markdown", description: "Append after --plan replacement; repeatable" },
+		{ name: "spec", type: "Markdown", description: "Replacement spec (what the task must deliver)" },
+		{ name: "append-spec", type: "Markdown", description: "Append to spec; repeatable" },
 		{ name: "notes", type: "Markdown", description: "Replacement implementation notes" },
 		{ name: "append-notes", type: "Markdown", description: "Append to implementation notes; repeatable" },
 		{ name: "comment", type: "Markdown", description: "Append a discussion comment; repeatable" },

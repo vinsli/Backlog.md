@@ -139,6 +139,10 @@ Brief explanation of the task purpose.
 
 <!-- DOD:END -->
 
+## Spec
+
+What the task must deliver: scope, requirements, and constraints.
+
 ## Implementation Plan
 
 1. Research approach
@@ -175,6 +179,8 @@ PR-style summary of what was implemented.
 | Uncheck DoD #2          | `backlog task edit 42 --uncheck-dod 2`                   |
 | Remove AC #3            | `backlog task edit 42 --remove-ac 3`                     |
 | Remove DoD #3           | `backlog task edit 42 --remove-dod 3`                    |
+| Set Spec                | `backlog task edit 42 --spec "What it must deliver"`     |
+| Append to Spec          | `backlog task edit 42 --append-spec "More scope"`        |
 | Add Plan                | `backlog task edit 42 --plan "1. Step one" --append-plan "2. Step two"` |
 | Add Notes (replace)     | `backlog task edit 42 --notes "What I did"`              |
 | Append Notes            | `backlog task edit 42 --append-notes "Another note"` |
@@ -332,7 +338,17 @@ These are visible in the task view output. Review them to understand the full co
 After the task is In Progress and assigned to you, research the current system: inspect relevant code, tests, conventions,
 and recent changes. Do not rely on an implementation approach proposed when the task was created.
 
-### 5.3. Create an Implementation Plan (The "how")
+### 5.3. Capture the Spec (The "what")
+
+If the task was created without a **Spec**, capture what the task must deliver — scope, requirements, and constraints —
+before writing the plan. The Spec is the "what"; the Implementation Plan below is the "how".
+
+```bash
+# Example
+backlog task edit 42 --spec "Must support batch sizes up to 10k. Errors are reported per item, never fatal for the batch."
+```
+
+### 5.4. Create an Implementation Plan (The "how")
 
 Previously created tasks contain the why and the what. Once you are familiar with that part you should think about a
 plan on **HOW** to tackle the task and all its acceptance criteria. This is your **Implementation Plan**.
@@ -345,13 +361,13 @@ When you are ready, write it down in the task so that you can refer to it later.
 backlog task edit 42 --plan "1. Research codebase for references\n2Research on internet for similar cases\n3. Implement\n4. Test"
 ```
 
-## 5.4. Implementation
+## 5.5. Implementation
 
 Once you have a plan, you can start implementing the task. This is where you write code, run tests, and make sure
 everything works as expected. Follow the acceptance criteria one by one and MARK THEM AS COMPLETE as soon as you
 finish them.
 
-### 5.5 Implementation Notes (Progress log)
+### 5.6 Implementation Notes (Progress log)
 
 Use Implementation Notes to log progress, decisions, and blockers as you work.
 Append notes progressively during implementation using `--append-notes`:
@@ -365,7 +381,7 @@ backlog task edit 42 --append-notes "Investigated root cause" --append-notes "Ad
 backlog task edit 42 --notes "Initial implementation done; pending integration tests"
 ```
 
-### 5.6 Final Summary (PR description)
+### 5.7 Final Summary (PR description)
 
 When you are done implementing a task you need to prepare a PR description for it.
 Because you cannot create PRs directly, write the PR as a clean summary in the Final Summary field.
@@ -379,9 +395,9 @@ backlog task edit 42 --final-summary "Implemented pattern X because Reason Y; up
 ```
 
 **IMPORTANT**: Do NOT include an Implementation Plan when creating a task. The plan is added only after you start the
-implementation.
+implementation. A **Spec** (the "what", not the "how") may be added at creation time with `--spec`.
 
-- Creation phase: provide Title, Description, Acceptance Criteria, and optionally labels/priority/assignee.
+- Creation phase: provide Title, Description, Acceptance Criteria, and optionally labels/priority/assignee (and Spec).
 - When you begin work, switch to edit, set the task in progress and assign to yourself
   `backlog task edit <id> -s "In Progress" -a "..."`.
 - Research the current code, tests, conventions, and recent changes, then add the current plan: `backlog task edit <id> --plan "..."`.
@@ -393,7 +409,7 @@ implementation.
 
 ## Phase discipline: What goes where
 
-- Creation: Title, Description, Acceptance Criteria, labels/priority/assignee.
+- Creation: Title, Description, Acceptance Criteria, labels/priority/assignee, optional Spec.
 - Implementation: Implementation Plan (after moving to In Progress and assigning to yourself) + Implementation Notes (progress log, appended as you work).
 - Wrap-up: Final Summary (PR description), verify AC and Definition of Done checks.
 

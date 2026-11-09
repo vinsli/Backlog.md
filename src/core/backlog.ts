@@ -312,6 +312,7 @@ function buildUpdatedDateComparableTask(task: Task): Record<string, unknown> {
 		modifiedFiles: task.modifiedFiles ?? [],
 		rawContent: task.rawContent ?? "",
 		description: task.description,
+		spec: task.spec,
 		implementationPlan: task.implementationPlan,
 		implementationNotes: task.implementationNotes,
 		comments: task.comments ?? [],
@@ -392,17 +393,23 @@ function normalizeTargetMilestone(targetMilestone: string | null | undefined): s
  */
 function assertSectionInputsSafe(input: {
 	description?: string;
+	spec?: string;
 	implementationPlan?: string;
 	implementationNotes?: string;
 	finalSummary?: string;
+	appendSpec?: string[];
 	appendImplementationPlan?: string[];
 	appendImplementationNotes?: string[];
 	appendFinalSummary?: string[];
 }): void {
 	assertSectionInputHasNoMarkerLines(input.description, "description");
+	assertSectionInputHasNoMarkerLines(input.spec, "spec");
 	assertSectionInputHasNoMarkerLines(input.implementationPlan, "implementationPlan");
 	assertSectionInputHasNoMarkerLines(input.implementationNotes, "implementationNotes");
 	assertSectionInputHasNoMarkerLines(input.finalSummary, "finalSummary");
+	for (const value of input.appendSpec ?? []) {
+		assertSectionInputHasNoMarkerLines(value, "spec");
+	}
 	for (const value of input.appendImplementationPlan ?? []) {
 		assertSectionInputHasNoMarkerLines(value, "implementationPlan");
 	}
@@ -2276,6 +2283,7 @@ export class Core {
 						milestone: input.milestone.trim(),
 					}),
 				...(typeof input.description === "string" && { description: input.description }),
+				...(typeof input.spec === "string" && { spec: input.spec }),
 				...(typeof input.implementationPlan === "string" && { implementationPlan: input.implementationPlan }),
 				...(typeof input.implementationNotes === "string" && { implementationNotes: input.implementationNotes }),
 				...(typeof input.finalSummary === "string" && { finalSummary: input.finalSummary }),
@@ -2768,6 +2776,26 @@ export class Core {
 				...(createdDate && { createdDate }),
 			};
 		};
+
+		if (input.clearSpec) {
+			if (task.spec !== undefined) {
+				task.spec = "";
+				mutated = true;
+			}
+		}
+
+		applyStringField(input.spec, task.spec, (next) => {
+			task.spec = next;
+		});
+
+		const specAppends = sanitizeAppendInput(input.appendSpec);
+		if (specAppends.length > 0) {
+			const { value, changed } = appendBlock(task.spec, specAppends);
+			if (changed) {
+				task.spec = value;
+				mutated = true;
+			}
+		}
 
 		if (input.clearImplementationPlan) {
 			if (task.implementationPlan !== undefined) {

@@ -13,15 +13,17 @@
 3. **Mark task as In Progress** via `task_edit` with status "In Progress"
 4. **Assign to yourself** via `task_edit` with assignee field
 5. **Research the current system** - Inspect relevant code, tests, conventions, and recent changes rather than relying on an approach proposed when the task was created
-6. **Draft and record the implementation plan** - Use `task_edit` with planSet or planAppend to capture the current approach in the task
-7. **Apply proportional review** - If the plan contains a material product, architecture, or workflow decision, or the project or user requires plan review, present it and wait for explicit approval before implementation. Routine plans can proceed when no review was requested and they stay within confirmed scope
-8. **Document the agreed breakdown** - In the parent task's plan, capture any approved list of subtasks, owners, and sequencing so a replacement agent can resume with the current structure
+6. **Capture the Spec if missing** - If the task has no Spec, use `task_edit` (spec, specSet, or specAppend field) to record what the task must deliver: scope, requirements, and constraints
+7. **Draft and record the implementation plan** - Use `task_edit` with planSet or planAppend to capture the current approach in the task
+8. **Apply proportional review** - If the plan contains a material product, architecture, or workflow decision, or the project or user requires plan review, present it and wait for explicit approval before implementation. Routine plans can proceed when no review was requested and they stay within confirmed scope
+9. **Document the agreed breakdown** - In the parent task's plan, capture any approved list of subtasks, owners, and sequencing so a replacement agent can resume with the current structure
 
 **IMPORTANT:** Use tasks as permanent storage for everything related to the work. You may be interrupted or replaced at any point, so the task record must contain everything needed for a clean handoff.
 
 ### Planning Guidelines
 
 - Keep the Backlog task as the single plan of record: capture the current approach with `task_edit` (planSet field) before writing code
+- Record the "what" before the "how": if the task lacks a Spec, use `task_edit` (spec or specSet field) so the deliverable's scope, requirements, and constraints are explicit before planning
 - Use `task_edit` (planAppend field) to refine the plan when you learn more during implementation
 - Verify prerequisites before committing to a plan: confirm required tools, access, data, and environment support are in place
 - Keep plans structured and actionable: list concrete steps, highlight key files, call out risks, and note any checkpoints or validations

@@ -1021,6 +1021,7 @@ export class BacklogServer {
 				references: payload.references,
 				modifiedFiles: payload.modifiedFiles,
 				parentTaskId: payload.parentTaskId,
+				spec: payload.spec,
 				implementationPlan: payload.implementationPlan,
 				implementationNotes: payload.implementationNotes,
 				finalSummary: payload.finalSummary,
@@ -1156,6 +1157,10 @@ export class BacklogServer {
 
 		if ("modifiedFiles" in updates && Array.isArray(updates.modifiedFiles)) {
 			updateInput.modifiedFiles = updates.modifiedFiles;
+		}
+
+		if ("spec" in updates && typeof updates.spec === "string") {
+			updateInput.spec = updates.spec;
 		}
 
 		if ("implementationPlan" in updates && typeof updates.implementationPlan === "string") {

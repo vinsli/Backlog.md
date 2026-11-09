@@ -1774,6 +1774,13 @@ export function generateDetailContent(
 	}
 	bodyContent.push("");
 
+	const spec = task.spec?.trim();
+	if (spec) {
+		bodyContent.push(formatHeading("Spec", 2));
+		bodyContent.push(transformCodePaths(spec));
+		bodyContent.push("");
+	}
+
 	const implementationPlan = task.implementationPlan?.trim();
 	if (implementationPlan) {
 		bodyContent.push(formatHeading("Implementation Plan", 2));

@@ -69,6 +69,7 @@ export function buildTaskSearchBodyText(task: Task): string {
 			.map((criterion) => `- [${criterion.checked ? "x" : " "}] ${criterion.text}`);
 		parts.push(lines.join("\n"));
 	}
+	if (task.spec) parts.push(task.spec);
 	if (task.implementationPlan) parts.push(task.implementationPlan);
 	if (task.implementationNotes) parts.push(task.implementationNotes);
 	if (Array.isArray(task.comments) && task.comments.length > 0) {

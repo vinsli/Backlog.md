@@ -82,6 +82,7 @@ type TaskDetailsJson = TaskSummaryJson & {
 	acceptanceCriteria: ChecklistItemJson[];
 	definitionOfDone: ChecklistItemJson[];
 	implementationPlan: string | null;
+	spec: string | null;
 	implementationNotes: string | null;
 	comments: TaskCommentJson[];
 	finalSummary: string | null;
@@ -191,6 +192,7 @@ function toTaskDetailsJson(task: TaskDetail, projectRoot: string): TaskDetailsJs
 		acceptanceCriteria: toChecklistJson(task.acceptanceCriteriaItems),
 		definitionOfDone: toChecklistJson(task.definitionOfDoneItems),
 		implementationPlan: nullable(task.implementationPlan),
+		spec: nullable(task.spec),
 		implementationNotes: nullable(task.implementationNotes),
 		comments: (task.comments ?? [])
 			.slice()

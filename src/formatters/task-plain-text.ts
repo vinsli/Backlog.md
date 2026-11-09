@@ -193,6 +193,14 @@ export function formatTaskPlainText(task: TaskDetail, options: TaskPlainTextOpti
 	}
 	lines.push("");
 
+	const spec = task.spec?.trim();
+	if (spec) {
+		lines.push("Spec:");
+		lines.push("-".repeat(50));
+		lines.push(transformCodePathsPlain(spec));
+		lines.push("");
+	}
+
 	const implementationPlan = task.implementationPlan?.trim();
 	if (implementationPlan) {
 		lines.push("Implementation Plan:");
